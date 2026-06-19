@@ -2,44 +2,47 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import pfp from '../assets/icon.png'
-// import { ActiveContext } from "../context/ActivePageContext"
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useContext } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { removeToken } from '../services/api'
 
 const NavBar = () => {
 
   const navigate = useNavigate()
-  // const activeContext = useContext(ActiveContext)
-  // if (!activeContext) return ("No content")
 
-  // const { activePage, setActivePage } = activeContext
+  const { isLoggedIn, setIsLoggedIn, user, setUser } = useAuth()
 
 
   const location = useLocation();
   const isNewTaskPage = location.pathname === "/new-task";
   const isMyTasksPage = location.pathname === "/my-tasks";
 
-  // const navLinkClass = (path: string) => 
-  //   `transition-colors duration-300 hover:text-[#1A3C34] ${
-  //     isActive(path) ? "text-[#7234a5]" : "text-[#838585]"
-  //   }`;
-
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    // setActivePage("Cover Page");
     navigate("/")
   }
   
   const handleNewTaskClick = (e: React.MouseEvent) => {
     e.preventDefault()
     navigate("/new-task")
-    // setActivePage("New Task");
+
   }
 
   const handleAllTasksClick = (e: React.MouseEvent) => {
     e.preventDefault()
     navigate("/my-tasks")
-    // setActivePage("My Task");
+  }
+
+  const handleLoginToggle = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (isLoggedIn) {
+      removeToken();
+      setIsLoggedIn(false)
+      setUser({ name: "", email: "" });
+      navigate('/auth');
+    } else {
+      navigate('/auth');
+    }
   }
 
   return (
@@ -54,8 +57,11 @@ const NavBar = () => {
         </div>
 
         <div className='flex items-center gap-2 md:gap-10'>
-        <nav className='flex gap-4 md:gap-6 font-medium text-[16px] md:text-[22px]'>
-
+        <nav className='flex gap-4 md:gap-6 font-medium text-[16px] md:text-[17px]'>
+          
+          {
+            isLoggedIn && (
+              <div>
           {
             (!isNewTaskPage) && (
 
@@ -70,15 +76,32 @@ const NavBar = () => {
               className='hover:text-[#974FD0] transition'>All Tasks</Link>
             )
           }
+              </div>
+            )
+          }
+
 
         </nav>
 
-        <div>
+        {/* <div>
           <img src={pfp} alt="" 
           className='w-[50px] h-[50px] md:w-[60px] md:h-[60px]'/>
-        </div>
+          </div> */}
 
         </div>
+
+        <div className='flex gap-5 items-center font-medium text-[14px] md:text-[17px]'>
+
+        {
+          isLoggedIn && (
+            <p>Hi, {user.name.split(" ")[0]}</p>
+          )
+        }
+          <button
+          onClick={handleLoginToggle}
+          className={!isLoggedIn ? "text-white hover:bg-[#7234a5] bg-[#974FD0] px-4 py-2  rounded-lg transition" : "hover:bg-red-500 bg-[#974FD0] px-4 py-2 rounded-lg text-white transition"}>{!isLoggedIn ? "Login" : "Logout"}</button>
+
+          </div>
 
     </div>
   )

@@ -4,6 +4,7 @@ import connectDB from "./config/db";
 import dns from 'dns';
 import taskRoutes from "./routes/taskRoutes"
 import cors from "cors"
+import authRoutes from './routes/authRoutes'
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 // Load environment variables first
@@ -38,6 +39,7 @@ app.use(express.urlencoded({extended:true}))
 // ============================================================
 // ROUTES
 // ============================================================
+app.use("/api/auth", authRoutes)
 app.use("/api/", taskRoutes)
 
 

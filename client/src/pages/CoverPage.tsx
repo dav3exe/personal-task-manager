@@ -1,10 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import NavBar from '../components/NavBar'
 import hero from '../assets/hero.png'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { useAuth } from "../context/AuthContext";
+import Modal from '../components/Modal';
 
 const CoverPage = () => {
   const navigate = useNavigate()
+  const {isLoggedIn} = useAuth()
+  const [modal, setModal] = useState<{
+      show: boolean;
+      type: "login"
+      message: string;
+  }>({ show: false, type: "login", message: "Please login to be able to access your tasks..." })
+
+  const handleShowModal = () => {
+    setModal((prev) => ({ ...prev, show: true }));
+  }
+
+  const handleCloseModal = () => {
+    setModal((prev) => ({ ...prev, show: false }));
+    navigate("/auth")
+  }
+
   return (
     <div>
       <NavBar/>
@@ -18,7 +36,7 @@ const CoverPage = () => {
         </p>
       <div>
         <button className='text-[16px] px-[22px] py-[8px] bg-[#974FD0] rounded-[8px] text-white hover:bg-[#7234a5] transition'
-        onClick={()=> navigate('/my-tasks')}>Go to My Tasks</button>
+        onClick={()=> isLoggedIn ? navigate('/my-tasks') : handleShowModal()}>Go to My Tasks</button>
       </div>
       </div>
 
@@ -28,6 +46,13 @@ const CoverPage = () => {
       </div>
 
       </div>
+      {modal.show && (
+        <Modal
+          type={modal.type}
+          message={modal.message}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   )
 }

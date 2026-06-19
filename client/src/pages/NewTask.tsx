@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import NavBar from '../components/NavBar'
 import back from '../assets/back.png'
 import { useNavigate } from 'react-router-dom';
-import { useCreateTask, useUpdateTask } from '../hooks/useTasksApi';
+import { useCreateTask, useUpdateTask } from '../hooks/useApi';
 import Modal from '../components/Modal';
 // import { useTaskActivePage } from '../context/ActivePageContext';
 import { useParams } from 'react-router-dom';
-import { useGetTaskById } from '../hooks/useTasksApi';
+import { useGetTaskById } from '../hooks/useApi';
 
 const NewTask = () => {
     const navigate = useNavigate()

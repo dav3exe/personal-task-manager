@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { getTasks } from '../services/api'
 import { useNavigate } from 'react-router-dom';
-import { useDeleteTask, useGetTasks, useUpdateTask } from '../hooks/useTasksApi';
+import { useDeleteTask, useGetTasks, useUpdateTask } from '../hooks/useApi';
 import { CircleLoader } from 'react-spinners';
 import editIcon from '../assets/edit icon.png'
 import deleteIcon from '../assets/delete icon.png'
 import tickIcon from '../assets/icons8-tick-48.png'
 import Modal from './Modal';
 import notFound from '../assets/notFound.png'
+import noTasks from '../assets/no tasks.png'
 
 
 type Task = {
@@ -47,7 +48,16 @@ const FetchData = () => {
 
     if (!data || data.length === 0) {
       return (
-        <div>No tasks found</div>
+        <div className='flex items-center justify-center w-full h-90'>
+          <p className='text-center w-60'>
+            <span className=' text-2xl font-bold block text-[#974FD0]'>No Tasks Yet!</span>
+            <span className='block flex justify-center my-5'><img src={noTasks} alt="" /></span>
+             Click on 
+             <strong 
+             className='text-[#974FD0] hover:underline'
+             onClick={()=>navigate("/new-task")}> add new task </strong> 
+             to start keeping track of your tasks.</p>
+        </div>
       )
     }
 

@@ -1,10 +1,11 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model, Document, ObjectId } from "mongoose";
 
-export interface ITask  {
+export interface ITask extends Document {
     title: string;
     description: string;
     completed: boolean;
-    tag: string
+    tag: string;
+    user: mongoose.Types.ObjectId
   
 }
 
@@ -27,6 +28,11 @@ const taskSchema = new Schema<ITask>(
         tag:{
             type: String,
         },
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+}
     },
     {
         timestamps: true,

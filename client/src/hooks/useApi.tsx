@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getTaskById, getTasks, deleteTask, updateTask, createTask } from "../services/api";
+import { getTaskById, getTasks, deleteTask, updateTask, createTask, registerUser, loginUser, getCurrentUser, verifyEmail, forgotPassword } from "../services/api";
 // import { useTaskActivePage } from "../context/ActivePageContext";
 type Task = {
   _id: string;
@@ -80,3 +80,81 @@ export const useDeleteTask = () => {
         },
     })
 }
+
+export const useRegisterUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: registerUser,
+        onSuccess:(data)=>{
+            localStorage.setItem(
+                "taskduty_token",
+                data.token
+            );
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(data.user)
+            );
+
+            queryClient.setQueryData(
+                ["current-user"],
+                data.user
+            );
+        }
+    })
+}
+
+export const useLoginUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn:loginUser,
+        onSuccess:(data)=>{
+            localStorage.setItem(
+                "taskduty_token",
+                data.token
+            );
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(data.user)
+            );
+
+            queryClient.setQueryData(
+                ["current-user"],
+                data.user
+            );
+        }
+    });
+};
+
+export const useGetCurrentUser = () => {
+    return useQuery({
+
+        queryKey:["current-user"],
+
+        queryFn:getCurrentUser,
+
+        retry:false,
+
+        staleTime:Infinity
+
+    });
+}
+
+export const useVerifyEmail = (token: string) => {
+    return useQuery({
+        queryKey: ["verify-email", token],
+
+        queryFn: () => verifyEmail(token),
+
+        enabled: !!token,
+
+        retry: false,
+    });
+};
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: forgotPassword,
+  });
+};
