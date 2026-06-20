@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from '../assets/logo.png'
 
-// ---- BACKEND: imported forgotPassword from api service ----
+
 import { forgotPassword } from "../services/api";
 
-// ---- BACKEND ADDED: imported Modal component ----
+
 import Modal from "../components/Modal";
 
 type User = {
@@ -24,9 +24,9 @@ const ForgotPassword = () => {
   });
   const navigate = useNavigate();
 
-  // ---- BACKEND ADDED: states for loading and modal feedback ----
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-   // ---- BACKEND ADDED: modal state ----
+  
   const [modal, setModal] = useState<{
     show: boolean;
     type: "success" | "error";
@@ -39,19 +39,19 @@ const ForgotPassword = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // typescript needs help knowing that name is a key of user
+
     const inputFieldName = name as keyof User;
     setUser({ ...user, [inputFieldName]: value });
-    // remove the error when there is a value in the input field
+
     setError({ ...error, [inputFieldName]: false });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-     // step 1, create a variable to catch the errors or determine if an error occured
+
     let hasError = false;
 
-    // step 2, create a placeholder object for the error state
+
     const newError: ErrorType = { email: false };
 
     if (!user.email.trim() || !user.email.includes("@")) {
@@ -66,21 +66,18 @@ const ForgotPassword = () => {
 
     try {
       setIsLoading(true);
-       //---- BACKEND CALL: send email to real backend ----
-      // ---- BACKEND REMOVED: navigate("/resetpassword") directly ----
-      // ---- BACKEND REMOVED: navigate("/resetpassword", { state: { email: user.email } }) ----
-      // ---- Now the backend sends a real reset email with a token link ----
+
       const result = await forgotPassword(user.email);
 
      if (result.success) {
-        // ---- BACKEND ADDED: show success modal then go to login ----
+
         setModal({
           show: true,
           type: "success",
           message: result.message || "Password reset link sent! Please check your email.",
         });
       } else {
-        // ---- BACKEND ADDED: show error modal ----
+
         setModal({
           show: true,
           type: "error",
@@ -88,7 +85,7 @@ const ForgotPassword = () => {
         });
       }
     } catch (error) {
-      // ---- BACKEND ADDED: show error modal on network failure ----
+
       setModal({
         show: true,
         type: "error",
@@ -98,12 +95,10 @@ const ForgotPassword = () => {
       setIsLoading(false);
     }
 
-    // reset form
     setUser({ email: "" });
     setError({ email: false });
   };
 
-  // ---- BACKEND ADDED: on success modal close go to login ----
   const handleModalClose = () => {
     setModal({ ...modal, show: false });
     if (modal.type === "success") {

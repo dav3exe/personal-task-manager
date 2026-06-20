@@ -2,8 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { verifyEmail } from "../services/api";
 
-// ---- BACKEND: calls verify email endpoint when page loads ----
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7200";
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();

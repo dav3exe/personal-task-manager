@@ -3,18 +3,12 @@ import logo from '../assets/logo.png'
 
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-// ---- BACKEND REMOVED: ResetSuccess component no longer needed ----
-// ---- We use Modal instead ----
-// import ResetSuccess from "./ResetSuccess";
-
-// ---- BACKEND: imported resetPassword from api service ----
 import { resetPassword } from "../services/api";
 
-// ---- BACKEND ADDED: imported Modal component ----
+
 import Modal from "../components/Modal";
 
 
-// Import eye icons from Lucide React
 import { Eye, EyeOff } from "lucide-react";  
 
 type User = {
@@ -96,7 +90,6 @@ const ResetPassword = () => {
       return;
     }
 
-    // ---- BACKEND ADDED: get token from URL ----
     const token = searchParams.get("token");
 
     if (!token) {
