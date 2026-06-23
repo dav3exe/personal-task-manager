@@ -6,6 +6,8 @@ export interface ITask extends Document {
     completed: boolean;
     tag: string;
     user: mongoose.Types.ObjectId
+    isDeleted: boolean
+
   
 }
 
@@ -28,11 +30,17 @@ const taskSchema = new Schema<ITask>(
         tag:{
             type: String,
         },
+
         user: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true
-}
+        },
+
+        isDeleted: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         timestamps: true,

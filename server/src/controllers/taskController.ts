@@ -41,7 +41,8 @@ export const getAllTasks = async(req: AuthRequest, res:Response)=>{
     const userId = req.user.id;
 
     const task = await Task.find({ 
-        user: userId 
+        user: userId,
+        isDeleted:false
     }).populate("user", "name email")
 
     res.status(200).json({sucess: true, task})
@@ -58,8 +59,10 @@ export const getSingleTask = async(req:AuthRequest, res:Response)=>{
         const userId = req.user?.id;
 
         const task = await Task.findOne({
-            _id: req.params.id, 
-            user: userId});
+            _id: req.params.id,
+            user: userId,
+            isDeleted:false
+        });
 
         if(!task){
             return res.status(404).json({success: false, message: `Task with id: ${req.params.id} not found`})
@@ -69,6 +72,23 @@ export const getSingleTask = async(req:AuthRequest, res:Response)=>{
         console.error("Get single task error:", error);
         res.status(500).json({ success: false, message: "Server Error" });  
     }
+}
+
+// get trashed tasks
+export const getTrashedTasks = async(req: AuthRequest, res:Response)=>{
+
+    if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+        
+    const userId = req.user.id;
+
+    const task = await Task.find({ 
+        user: userId,
+        isDeleted:true
+    }).populate("user", "name email")
+
+    res.status(200).json({sucess: true, task})
 }
 
 // update a task
@@ -149,6 +169,80 @@ export const deleteTask = async(req:AuthRequest, res:Response)=>{
         res.status(200).json({success: true, message: "Task deleted"})
     } catch (error) {
         console.error("Delete task error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+
+}
+
+// soft delete task
+export const softDeleteTask = async(req:AuthRequest, res:Response)=>{
+    try {
+
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const userId = req.user?.id;
+
+        const task = await Task.findOneAndUpdate({
+            _id: req.params.id,
+            user: userId
+        },
+        {
+            isDeleted:true
+        },
+        {
+            new: true
+        }
+    );
+
+        if (!task) {
+            return res.status(404).json({
+            success: false,
+            message: "Task not found or not authorized",
+            });
+        }
+
+        res.status(200).json({success: true, message: "Task moved to trash"})
+    } catch (error) {
+        console.error("Move task to trash error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+
+}
+
+// restore deleted task
+export const restoreTask = async(req:AuthRequest, res:Response)=>{
+    try {
+
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const userId = req.user?.id;
+
+        const task = await Task.findOneAndUpdate({
+            _id: req.params.id,
+            user: userId,
+        },
+        {
+            isDeleted:false
+        },
+        {
+            new: true
+        }
+    );
+
+        if (!task) {
+            return res.status(404).json({
+            success: false,
+            message: "Task not found or not authorized",
+            });
+        }
+
+        res.status(200).json({success: true, message: "Task restored"})
+    } catch (error) {
+        console.error("remove from trash error:", error);
         res.status(500).json({ success: false, message: "Server error" });
     }
 
