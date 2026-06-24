@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getTaskById, getTasks, deleteTask, updateTask, createTask, registerUser, loginUser, getCurrentUser, verifyEmail, forgotPassword } from "../services/api";
+import { getTaskById, getTasks, deleteTask, updateTask, createTask, registerUser, loginUser, getCurrentUser, verifyEmail, forgotPassword, softDeleteTask, getTrashedTasks, restoreTask } from "../services/api";
 // import { useTaskActivePage } from "../context/ActivePageContext";
 type Task = {
   _id: string;
@@ -19,7 +19,7 @@ export const useGetTaskById = (id: string) => {
 
 export const useGetTasks = () => {
     return useQuery<Task[]>({
-        queryKey: ["tasks"],
+        queryKey: ["tasks", "active"],
         // nested array, this is how to reach what i need
         queryFn: () => getTasks().then((res) => res.task),
         
@@ -61,6 +61,46 @@ export const useUpdateTask = () => {
         onSuccess: () => {
             // Invalidate and refetch
             queryClient.invalidateQueries({ queryKey: ['tasks'] })
+        }
+
+    })
+}
+
+export const useSoftDeleteTask = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (_id:string) => softDeleteTask(_id),
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ['tasks'] })
+        },
+
+        onError(error) {
+            console.error(error)
+        },
+    })
+}
+
+export const useGetTrashedTasks = () => {
+    return useQuery<Task[]>({
+        queryKey: ["tasks", "trash"],
+        // nested array, this is how to reach what i need
+        queryFn: () => getTrashedTasks().then((res) => res.task),
+        
+    })
+}
+
+export const useRestoreTask = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (_id:string) => restoreTask(_id),
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ['tasks', 'trash'] })
+            
+            queryClient.invalidateQueries({
+                queryKey:['tasks','active']
+            });
         }
 
     })

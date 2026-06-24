@@ -60,6 +60,21 @@ export const updateTask = async (id: string,
   return res.data;
 };
 
+export const softDeleteTask = async (id: string) => {
+  const res = await taskManagerApi.patch(`/api/tasks/${id}`);
+  return res.data;
+};
+
+export const getTrashedTasks = async () => {
+  const res = await taskManagerApi.get(`/api/tasks/trash/`);
+  return res.data;
+};
+
+export const restoreTask = async (id: string) => {
+  const res = await taskManagerApi.patch(`/api/tasks/${id}/restore`);
+  return res.data;
+};
+
 export const deleteTask = async (id: string) => {
   const res = await taskManagerApi.delete(`/api/tasks/${id}`);
   return res.data;
@@ -115,3 +130,4 @@ export const resetPassword = async (
   )
   return res.data
 }
+

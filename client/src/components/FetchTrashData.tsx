@@ -1,14 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useDeleteTask, useGetTasks, useSoftDeleteTask, useUpdateTask } from '../hooks/useApi';
+import { useGetTrashedTasks, useRestoreTask, useDeleteTask } from '../hooks/useApi';
 import { CircleLoader } from 'react-spinners';
-import editIcon from '../assets/edit icon.png'
-import deleteIcon from '../assets/delete icon.png'
 import tickIcon from '../assets/icons8-tick-48.png'
 import notFound from '../assets/notFound.png'
-import noTasks from '../assets/no tasks.png'
+import emptyTrash from '../assets/empty trash.png'
+import restore from '../assets/restore.png'
+import deleteIcon from '../assets/delete icon.png'
 import ConfirmationModal from './ConfirmationModal';
 import toast from 'react-hot-toast';
+
 
 
 type Task = {
@@ -19,20 +20,20 @@ type Task = {
   tag: string
 }
 
-const FetchData = () => {
-  const navigate = useNavigate();
+const FetchTrashData = () => {
+    const navigate = useNavigate();
 
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
-  const [confirmModalMode, setconfirmModalMode] = useState<"delete" | "trash">("delete")
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+    const [confirmModalMode, setconfirmModalMode] = useState<"delete" | "trash">("delete")
+    const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
 
-  const { mutate: mutateTask } = useUpdateTask();
-  const { mutate: trashTask } = useSoftDeleteTask();
+  const { mutate: deleteTask } = useDeleteTask();
 
   const [statusFilter, setStatusFilter] = useState("All");
   const [tagFilter, setTagFilter] = useState("All");
 
-  const { data, isLoading, isError } = useGetTasks();
+  const { data, isLoading, isError } = useGetTrashedTasks();
+  const { mutate: restoreTask } = useRestoreTask();
 
     if (isLoading) {
       return (
@@ -48,119 +49,46 @@ const FetchData = () => {
       return (
         <div className='flex items-center justify-center w-full h-90'>
           <p className='text-center w-60'>
-            <span className=' text-2xl font-bold block text-[#974FD0]'>No Tasks Yet!</span>
-            <span className='block flex justify-center my-5'><img src={noTasks} alt="" /></span>
+            <span className=' text-2xl font-bold block text-[#974FD0]'>No Trashed Tasks!</span>
+            <span className='block flex justify-center my-5'><img src={emptyTrash} alt="" /></span>
              Click on 
              <strong 
              className='text-[#974FD0] hover:underline'
-             onClick={()=>navigate("/new-task")}> add new task </strong> 
-             to start keeping track of your tasks.</p>
+             onClick={()=>navigate("/my-tasks")}> my tasks </strong> 
+             to see all your tasks.</p>
         </div>
       )
     }
 
-    const markCompleted = (task: Task)=> {
-      mutateTask({
-        _id: task._id,
-        data: {
-          title: task.title,
-          description: task.description,
-          tag: task.tag,
-          completed: true,
-        },
-      },
-      {
-        onSuccess: () => {
-          toast.success("Task completed!", {
-            style: {
-              background: '#974FD0',   // purple theme background
-              color: '#fff',
-              border: '1px solid #7234a5',
-              fontWeight: 500,
-            },
-            iconTheme: {
-              primary: '#fff',         // tick icon color
-              secondary: '#974FD0',    // tick circle bg (matches theme)
-            },
-          });        
-        },
-          onError: () => {
-            toast.error("Something went wrong. Please try again.", {
-              style: {
-                background: '#F38383',
-                color: '#fff',
-                border: '1px solid #d65a5a',
-                fontWeight: 500,
-              },
-              iconTheme: {
-                primary: '#fff',
-                secondary: '#F38383',
-              },
-            });
-          }
-      });
-    }
+    // const markCompleted = (task: Task)=> {
+    //   mutateTask({
+    //     _id: task._id,
+    //     data: {
+    //       title: task.title,
+    //       description: task.description,
+    //       tag: task.tag,
+    //       completed: true,
+    //     },
+    //   });
+    // }
 
-    const markIncomplete = (task: Task)=> {
-      mutateTask({
-        _id: task._id,
-        data: {
-          title: task.title,
-          description: task.description,
-          tag: task.tag,
-          completed: false,
-        },
-        
-      },
-    {
-        onSuccess: () => {
-          toast.error("Task incomplete", {
-            style: {
-              background: '#974FD0',   // purple theme background
-              color: '#fff',
-              border: '1px solid #7234a5',
-              fontWeight: 500,
-            },
-            iconTheme: {
-              primary: '#fff',         // tick icon color
-              secondary: '#974FD0',    // tick circle bg (matches theme)
-            },
-          });        
-        },
-          onError: () => {
-            // Restore failure uses a styled error toast (red = failure)
-            toast.error("Something went wrong. Please try again.", {
-              style: {
-                background: '#F38383',
-                color: '#fff',
-                border: '1px solid #d65a5a',
-                fontWeight: 500,
-              },
-              iconTheme: {
-                primary: '#fff',
-                secondary: '#F38383',
-              },
-            });
-          }
-    });
-    }
+    // const markIncomplete = (task: Task)=> {
+    //   mutateTask({
+    //     _id: task._id,
+    //     data: {
+    //       title: task.title,
+    //       description: task.description,
+    //       tag: task.tag,
+    //       completed: false,
+    //     },
+    //   });
+    // }
 
-    const handleTrash = (task: Task)=> {
+    const handleRestore = (task: Task)=> {
 
-          setSelectedTaskId(task._id)
-          setconfirmModalMode("trash")
-          setIsConfirmModalOpen(true)
-
-    }
-
-    const handleConfirm = () => {
-        if (!selectedTaskId) return
-        setIsConfirmModalOpen(false)
-        if (confirmModalMode === 'trash') {
-          trashTask(selectedTaskId, {
-          // On success, fire a styled success toast instead of opening a Modal
+        restoreTask(task._id, {
           onSuccess: () => {
-            toast.success("Task moved to trash!", {
+            toast.success("Task restored!", {
               style: {
                 background: '#974FD0',   // purple theme background
                 color: '#fff',
@@ -172,8 +100,54 @@ const FetchData = () => {
                 secondary: '#974FD0',    // tick circle bg (matches theme)
               },
             });
-            // Refresh the list view after the action
-            navigate("/my-tasks");
+          },
+
+          onError: () => {
+            toast.error("Something went wrong. Please try again.", {
+              style: {
+                background: '#F38383',
+                color: '#fff',
+                border: '1px solid #d65a5a',
+                fontWeight: 500,
+              },
+              iconTheme: {
+                primary: '#fff',
+                secondary: '#F38383',
+              },
+            });
+          }
+    })
+
+
+    }
+
+        const handleDelete = (task: Task)=> {
+            setSelectedTaskId(task._id)
+            setconfirmModalMode("delete")
+            setIsConfirmModalOpen(true)
+
+    }
+
+    const handleConfirm = () => {
+        if (!selectedTaskId) return
+        setIsConfirmModalOpen(false)
+        if (confirmModalMode === 'delete') {
+        deleteTask(selectedTaskId, {
+          // On success, fire a styled success toast instead of opening a Modal
+          onSuccess: () => {
+            setSelectedTaskId(null)
+            toast.success("Task deleted!", {
+              style: {
+                background: '#974FD0',   // purple theme background
+                color: '#fff',
+                border: '1px solid #7234a5',
+                fontWeight: 500,
+              },
+              iconTheme: {
+                primary: '#fff',         // tick icon color
+                secondary: '#974FD0',    // tick circle bg (matches theme)
+              },
+            });
           },
 
           // On failure, fire a styled error toast (red so failure reads as failure)
@@ -192,10 +166,10 @@ const FetchData = () => {
             });
           }
     })
-      }
+        }
     }
 
-        const handleCancel = () => {
+    const handleCancel = () => {
         setIsConfirmModalOpen(false)
         setSelectedTaskId(null)
     }
@@ -260,24 +234,26 @@ const handleClear = () => {
             className='w-full border border-[hsla(0,1%,72%,0.5)] px-3 rounded'>
               <div className='flex justify-between border-b border-[hsla(0,1%,72%,0.5)] py-3'>
                 <div className='flex items-end gap-1'>
-                  <p className={` text-[17px] ${result.tag === "Urgent" ? `text-[#F38383]` : result.tag === "Important" ? `text-amber-400` : `text-[#73C3A6]`}` }>{result.tag}</p>
+                  <p className={` text-[17px] ${result.tag === "Urgent" ? `text-[#F38383]` : result.tag === "Important" ? `text-amber-400`: `text-[#73C3A6]`}` }>{result.tag}</p>
 
                 </div>
 
                 <div className='flex gap-2 md:gap-5'>
-                  <button className='px-[12px] py-[8px] md:px-[22px] md:py-[8px] items-center bg-[#974FD0] hover:bg-[#7234a5] flex gap-2 text-white rounded-[8px] transition'>
-                    <img src={editIcon} alt="completed" 
+
+                  <button className='px-[12px] py-[8px] md:px-[22px] md:py-[8px] items-center bg-[#974FD0] hover:bg-[#7234a5] flex gap-2 text-white rounded-[8px]  transition'
+                  onClick={()=>handleRestore(result)}>
+                    <img src={restore} alt="" 
                     className='w-[20px] h-[20px] md:w-[24px] md:h-[24px]'
-                    onClick={() => navigate(`/edit-task/${result._id}`)}/>
-                    Edit
-                    </button>
+                    
+                    />Restore</button>
 
                   <button className='px-[12px] py-[8px] md:px-[22px] md:py-[8px] items-center border border-[#974FD0] flex gap-2 text-[#974FD0] rounded-[8px] hover:bg-red-400 transition'
-                  onClick={()=>handleTrash(result)}>
+                  onClick={()=>handleDelete(result)}>
                     <img src={deleteIcon} alt="" 
                     className='w-[20px] h-[20px] md:w-[24px] md:h-[24px]'
                     
                     />Delete</button>
+
                 </div>
               </div>
 
@@ -296,12 +272,12 @@ const handleClear = () => {
                 <p className=' text-[#737171]'>{result.description}</p>
               </div>
 
-              <button
+              {/* <button
               className='hover:underline text-[#974FD0]'
               onClick={()=> result.completed ? markIncomplete(result) : markCompleted(result)}>{
                 result.completed ? "Mark as incomplete" : "Mark completed"
               }
-              </button>
+              </button> */}
 
             </div>
           )
@@ -338,13 +314,13 @@ const handleClear = () => {
                     {filteredTasks.length === 0 && (
                 <div className='w-full items-center justify-center flex flex-col gap-5 py-10'>
                   <img src={notFound} alt="" />
-                  <p className='text-2xl md:text-3xl font-bold'>NO TASK FOUND</p>
+                  <p className='text-2xl md:text-3xl font-bold'>No Task With Set Filter Found</p>
                   <button
                     type='button'
-                    className='bg-[#974FD0] hover:bg-[#7234a5] transition w-[140px] h-[62px] p-[10px] rounded-[10px] text-white text-[18px] font-[400]'
+                    className='bg-[#974FD0] hover:bg-[#7234a5] transition w-[140px] h-[62px] p-[10px] rounded-[10px] text-white text[18px] font-[400]'
                     onClick={handleClear}
                   >
-                    Clear Filter
+                    Clear Filter?
                   </button>
                 </div>
               )}
@@ -353,5 +329,4 @@ const handleClear = () => {
 
   )
 }
-
-export default FetchData
+export default FetchTrashData;

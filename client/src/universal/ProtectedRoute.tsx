@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { CircleLoader } from 'react-spinners';
+import { Loader } from 'lucide-react';
 // interface Props {
  
 //   adminOnly?: boolean; 
@@ -14,7 +14,7 @@ const ProtectedRoute = () => {
   // }
 
   if (isCheckingAuth) {
-    return <CircleLoader/>; // or a spinner / null
+    return <Loader className='flex w-screen self-center'/>; // or a spinner / null
   }
 
   if (!isLoggedIn) {
