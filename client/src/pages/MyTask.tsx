@@ -16,7 +16,7 @@ const MyTask = () => {
         <NavBar/>
         <div className='w-full h-screen px-[5%] md:px-[10%] lg:px-[20%] pt-10 flex flex-col gap-7 '>
             <div className='flex justify-between items-center'>
-                <h1 className='text-[40px] font-medium'>My Tasks</h1>
+                <h1 className='text-[30px] md:text-[40px] font-medium'>My Tasks</h1>
                 <button className='text-[#974FD0]  flex items-center gap-1 hover:underline'
                 onClick={() => {
                   navigate("/new-task")

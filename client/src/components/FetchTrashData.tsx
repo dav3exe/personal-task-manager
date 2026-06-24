@@ -60,29 +60,6 @@ const FetchTrashData = () => {
       )
     }
 
-    // const markCompleted = (task: Task)=> {
-    //   mutateTask({
-    //     _id: task._id,
-    //     data: {
-    //       title: task.title,
-    //       description: task.description,
-    //       tag: task.tag,
-    //       completed: true,
-    //     },
-    //   });
-    // }
-
-    // const markIncomplete = (task: Task)=> {
-    //   mutateTask({
-    //     _id: task._id,
-    //     data: {
-    //       title: task.title,
-    //       description: task.description,
-    //       tag: task.tag,
-    //       completed: false,
-    //     },
-    //   });
-    // }
 
     const handleRestore = (task: Task)=> {
 
@@ -90,14 +67,14 @@ const FetchTrashData = () => {
           onSuccess: () => {
             toast.success("Task restored!", {
               style: {
-                background: '#974FD0',   // purple theme background
+                background: '#974FD0',  
                 color: '#fff',
                 border: '1px solid #7234a5',
                 fontWeight: 500,
               },
               iconTheme: {
-                primary: '#fff',         // tick icon color
-                secondary: '#974FD0',    // tick circle bg (matches theme)
+                primary: '#fff',
+                secondary: '#974FD0',
               },
             });
           },
@@ -133,35 +110,34 @@ const FetchTrashData = () => {
         setIsConfirmModalOpen(false)
         if (confirmModalMode === 'delete') {
         deleteTask(selectedTaskId, {
-          // On success, fire a styled success toast instead of opening a Modal
+
           onSuccess: () => {
             setSelectedTaskId(null)
             toast.success("Task deleted!", {
               style: {
-                background: '#974FD0',   // purple theme background
+                background: '#974FD0',   
                 color: '#fff',
                 border: '1px solid #7234a5',
                 fontWeight: 500,
               },
               iconTheme: {
-                primary: '#fff',         // tick icon color
-                secondary: '#974FD0',    // tick circle bg (matches theme)
+                primary: '#fff',         
+                secondary: '#974FD0',
               },
             });
           },
 
-          // On failure, fire a styled error toast (red so failure reads as failure)
           onError: () => {
             toast.error("Something went wrong. Please try again.", {
               style: {
-                background: '#F38383',   // soft red, consistent with the app's danger color
+                background: '#F38383',
                 color: '#fff',
                 border: '1px solid #d65a5a',
                 fontWeight: 500,
               },
               iconTheme: {
-                primary: '#fff',         // cross icon color
-                secondary: '#F38383',    // cross circle bg
+                primary: '#fff',
+                secondary: '#F38383',
               },
             });
           }
@@ -199,7 +175,7 @@ const handleClear = () => {
             <p>{`Showing ${filteredTasks.length} of ${data.length} task${data.length > 1 ? `s` : ""}`}</p>
         </div>
 
-    <div className='flex gap-5'>
+    <div className='flex flex-col gap-5'>
 
   <select
     value={statusFilter}
@@ -272,12 +248,6 @@ const handleClear = () => {
                 <p className=' text-[#737171]'>{result.description}</p>
               </div>
 
-              {/* <button
-              className='hover:underline text-[#974FD0]'
-              onClick={()=> result.completed ? markIncomplete(result) : markCompleted(result)}>{
-                result.completed ? "Mark as incomplete" : "Mark completed"
-              }
-              </button> */}
 
             </div>
           )
