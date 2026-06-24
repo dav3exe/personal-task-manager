@@ -175,7 +175,7 @@ const handleClear = () => {
             <p>{`Showing ${filteredTasks.length} of ${data.length} task${data.length > 1 ? `s` : ""}`}</p>
         </div>
 
-    <div className='flex flex-col gap-5'>
+    <div className='flex flex-col md:flex-row gap-5'>
 
   <select
     value={statusFilter}

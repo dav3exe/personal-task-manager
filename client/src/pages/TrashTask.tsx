@@ -12,14 +12,14 @@ const TrashTask = () => {
         <NavBar/>
         <div className='w-full h-screen px-[5%] md:px-[10%] lg:px-[20%] pt-10 flex flex-col gap-7 '>
             <div className='flex justify-between items-center'>
-            <div className='flex gap-4 items-center'
+            <div className='flex  gap-4 items-center'
             onClick={ ()=>navigate("/my-tasks") }>
                 <div className='hover:scale-130 transform'>
                     <img src={back} alt="" 
                     className='w-[15px] h-[30px]'/>
                 </div>
 
-                <h1 className='text-[40px] font-medium '>Trash</h1>
+                <h1 className='text-[30px] md:text-[40px] font-medium '>Trash</h1>
             </div>
                 <button className='text-[#974FD0]  flex items-center gap-1 hover:underline'
                 onClick={() => {
